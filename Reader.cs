@@ -26,11 +26,9 @@ namespace REA_OOP_Stage_1
         public DateTime Birthday { get; set; } //Дата рождения
         public string Phone { get; set; } //Телефон
         public string Education { get; set; } //Образование
-        public Hall Hall { get; set; } //Холл
-        public List<Book> Books { get; set; } //Список книг
         private static int size = 0;
 
-        public Reader(string fullName, int ticketNum, DateTime birthday, string phone, string education, Hall hall)
+        public Reader(string fullName, int ticketNum, DateTime birthday, string phone, string education)
         {
             ID = size;
             FullName = fullName;
@@ -38,7 +36,6 @@ namespace REA_OOP_Stage_1
             Birthday = birthday;
             Phone = phone;
             Education = education;
-            Hall = hall;
             size++;
         }
 
@@ -47,6 +44,24 @@ namespace REA_OOP_Stage_1
             if (this.ID > obj.ID) { return 1; }
             if (this.ID < obj.ID) { return -1; }
             return 0;
+        }
+
+        public static void RestoreIndex(int index)
+        {
+            size = index;
+        }
+
+        public string[] ForDataGrid()
+        {
+            string[] tmp = {
+                this.ID.ToString(),
+                this.FullName,
+                this.TicketNum.ToString(),
+                this.Birthday.ToLongDateString(),
+                this.Phone,
+                this.Education
+            };
+            return tmp;
         }
     }
 

@@ -24,7 +24,6 @@ namespace REA_OOP_Stage_1
         public int HallNum { get; set; } //Зал
         public string Spec { get; set; } //Специализация
         public int SitCount { get; set; } //Количество мест
-        public List<Reader> Readers { get; set; } //Список читателей
         private static int size = 0;
 
         public Hall(string name, int hallNum, string spec, int sitCount)
@@ -35,6 +34,23 @@ namespace REA_OOP_Stage_1
             Spec = spec;
             SitCount = sitCount;
             size++;
+        }
+
+        public static void RestoreIndex(int index)
+        {
+            size = index;
+        }
+
+        public string[] ForDataGrid()
+        {
+            string[] tmp = {
+                this.ID.ToString(),
+                this.Name,
+                this.HallNum.ToString(),
+                this.Spec,
+                this.SitCount.ToString()
+            };
+            return tmp;
         }
 
         public int CompareTo(Hall obj)

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
@@ -36,6 +38,15 @@ namespace REA_OOP_Stage_1
             foreach (Book book in books)
             {
                 dataGridView1.Rows.Add(book.ForDataGrid());
+            }
+        }
+
+        private void UpdateReaderGrid()
+        {
+            dataGridView2.Rows.Clear();
+            foreach (Reader reader in readers)
+            {
+                dataGridView2.Rows.Add(reader.ForDataGrid());
             }
         }
 
@@ -91,13 +102,18 @@ namespace REA_OOP_Stage_1
             string fname;
             BinaryFormatter bf;
             FileStream fs;
+
             //Load Books
             fname = "data_book.bin"; // прописываем путь к файлу
             bf = new BinaryFormatter();
             fs = new FileStream(fname, FileMode.OpenOrCreate);
             books = (List<Book>)bf.Deserialize(fs);
             fs.Close();
-            Book.RestoreIndex(books.Last().ID + 1);
+            if (books.Count > 0)
+            {
+                Book.RestoreIndex(books.Last().ID + 1);
+            }
+            UpdateBookGrid();
 
             //Load BooksToReaders
             fname = "data_bookToReaders.bin"; // прописываем путь к файлу
@@ -112,6 +128,11 @@ namespace REA_OOP_Stage_1
             fs = new FileStream(fname, FileMode.OpenOrCreate);
             readers = (List<Reader>)bf.Deserialize(fs);
             fs.Close();
+            if (readers.Count > 0)
+            {
+                Reader.RestoreIndex(readers.Last().ID + 1);
+            }
+            UpdateReaderGrid();
 
             //Save ReadersToHalls
             fname = "data_readersToHalls.bin"; // прописываем путь к файлу
@@ -151,6 +172,23 @@ namespace REA_OOP_Stage_1
 
         }
 
+        private void dataGridView2_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                textBox10.Text = dataGridView2.Rows[e.RowIndex].Cells[0].Value.ToString();
+                label19.Text = dataGridView2.Rows[e.RowIndex].Cells[0].Value.ToString();
+
+                Reader tmp = readers.Where(w => w.ID == Int32.Parse(dataGridView2.Rows[e.RowIndex].Cells[0].Value.ToString())).Select(w => w).ToList()[0];
+                textBox14.Text = tmp.FullName;
+                numericUpDown4.Value = tmp.TicketNum;
+                dateTimePicker5.Value = tmp.Birthday;
+                textBox12.Text = tmp.Phone;
+                textBox11.Text = tmp.Education;
+            }
+
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
             Book tmp = new Book(textBox1.Text, textBox2.Text, textBox3.Text, textBox4.Text, dateTimePicker1.Value, dateTimePicker2.Value, (int)numericUpDown1.Value);
@@ -182,6 +220,38 @@ namespace REA_OOP_Stage_1
             qr.ReceiveDate = dateTimePicker3.Value;
             qr.Count = (int)numericUpDown2.Value;
             UpdateBookGrid();
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            Reader tmp = new Reader(textBox18.Text, (int)numericUpDown3.Value, dateTimePicker7.Value, textBox16.Text, textBox15.Text);
+            readers.Add(tmp);
+            UpdateReaderGrid();
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            var qr = readers.Where(w => w.ID == Int32.Parse(label19.Text)).First();
+            qr.FullName = textBox14.Text;
+            qr.TicketNum = (int)numericUpDown4.Value;
+            qr.Birthday = dateTimePicker5.Value;
+            qr.Phone = textBox12.Text;
+            qr.Education = textBox11.Text;
+            UpdateReaderGrid();
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            var readerId = Int32.Parse(textBox10.Text);
+            var qr = readers.Where(w => w.ID == readerId).Select(w => w).ToList();
+            var tmpReaders = readers;
+            foreach (Reader item in qr)
+            {
+                tmpReaders.Remove(item);
+            }
+            readers = tmpReaders;
+            UpdateReaderGrid();
+            Reader.RestoreIndex(readers.Last().ID + 1);
         }
     }
 }
