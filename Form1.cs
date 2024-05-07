@@ -33,6 +33,7 @@ namespace REA_OOP_Stage_1
         private void сохранитьToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Сохранение...");
+            toolStripStatusLabel1.Text = "Сохранение...";
             string fname;
             BinaryFormatter bf;
             FileStream fs;
@@ -71,49 +72,53 @@ namespace REA_OOP_Stage_1
             bf.Serialize(fs, halls);
             fs.Close();
             Console.WriteLine("Сохранено");
+            toolStripStatusLabel1.Text = "Сохранено";
         }
 
         private void загрузитьToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Загрузка...");
+            toolStripStatusLabel1.Text = "Загрузка...";
             string fname;
             BinaryFormatter bf;
             FileStream fs;
-            //Save Books
+            //Load Books
             fname = "data_book.bin"; // прописываем путь к файлу
             bf = new BinaryFormatter();
             fs = new FileStream(fname, FileMode.OpenOrCreate);
             books = (List<Book>)bf.Deserialize(fs);
             fs.Close();
 
-            //Save Books
+            //Load BooksToReaders
             fname = "data_bookToReaders.bin"; // прописываем путь к файлу
             bf = new BinaryFormatter();
             fs = new FileStream(fname, FileMode.OpenOrCreate);
             booksToReaders = (List<BookToReader>)bf.Deserialize(fs);
             fs.Close();
 
-            //Save Books
+            //Save Readers
             fname = "data_readers.bin"; // прописываем путь к файлу
             bf = new BinaryFormatter();
             fs = new FileStream(fname, FileMode.OpenOrCreate);
             readers = (List<Reader>)bf.Deserialize(fs);
             fs.Close();
 
-            //Save Books
+            //Save ReadersToHalls
             fname = "data_readersToHalls.bin"; // прописываем путь к файлу
             bf = new BinaryFormatter();
             fs = new FileStream(fname, FileMode.OpenOrCreate);
             readerToHalls = (List<ReaderToHall>)bf.Deserialize(fs);
             fs.Close();
 
-            //Save Books
+            //Save Halls
             fname = "data_halls.bin"; // прописываем путь к файлу
             bf = new BinaryFormatter();
             fs = new FileStream(fname, FileMode.OpenOrCreate);
             halls = (List<Hall>)bf.Deserialize(fs);
             fs.Close();
             Console.WriteLine("Загружено");
+            toolStripStatusLabel1.Text = "Загружено";
         }
+
     }
 }

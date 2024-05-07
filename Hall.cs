@@ -23,17 +23,18 @@ namespace REA_OOP_Stage_1
         public string Name { get; set; } //Название библиотеки
         public int HallNum { get; set; } //Зал
         public string Spec { get; set; } //Специализация
-        public int Size { get; set; } //Количество мест
+        public int SitCount { get; set; } //Количество мест
         public List<Reader> Readers { get; set; } //Список читателей
         private static int size = 0;
 
-        public Hall(string name, int hallNum, string spec, int size)
+        public Hall(string name, int hallNum, string spec, int sitCount)
         {
             ID = size;
             Name = name;
             HallNum = hallNum;
             Spec = spec;
-            Size = size;
+            SitCount = sitCount;
+            size++;
         }
 
         public int CompareTo(Hall obj)
