@@ -43,6 +43,26 @@ namespace REA_OOP_Stage_1
             size++;
         }
 
+        public static void RestoreIndex(int index)
+        {
+            size = index;
+        }
+
+        public string[] ForDataGrid()
+        {
+            string[] tmp = {
+                this.ID.ToString(),
+                this.Title,
+                this.Author,
+                this.ReleaseYear,
+                this.BookCode,
+                this.IssueDate.ToLongDateString(),
+                this.ReceiveDate.ToLongDateString(),
+                this.Count.ToString(),
+            };
+            return tmp;
+        }
+
         public int CompareTo(Book obj)
         {
             if (this.ID > obj.ID) { return 1; }

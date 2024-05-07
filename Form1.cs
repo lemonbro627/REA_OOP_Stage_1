@@ -30,6 +30,15 @@ namespace REA_OOP_Stage_1
             
         }
 
+        private void UpdateBookGrid()
+        {
+            dataGridView1.Rows.Clear();
+            foreach (Book book in books)
+            {
+                dataGridView1.Rows.Add(book.ForDataGrid());
+            }
+        }
+
         private void сохранитьToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Console.WriteLine("Сохранение...");
@@ -88,6 +97,7 @@ namespace REA_OOP_Stage_1
             fs = new FileStream(fname, FileMode.OpenOrCreate);
             books = (List<Book>)bf.Deserialize(fs);
             fs.Close();
+            Book.RestoreIndex(books.Last().ID + 1);
 
             //Load BooksToReaders
             fname = "data_bookToReaders.bin"; // прописываем путь к файлу
@@ -118,7 +128,60 @@ namespace REA_OOP_Stage_1
             fs.Close();
             Console.WriteLine("Загружено");
             toolStripStatusLabel1.Text = "Загружено";
+
+            UpdateBookGrid();
         }
 
+        private void dataGridView1_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                textBox9.Text = dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString();
+                label16.Text = dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString();
+
+                Book tmp = books.Where(w => w.ID == Int32.Parse(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString())).Select(w => w).ToList()[0];
+                textBox8.Text = tmp.Title;
+                textBox7.Text = tmp.Author;
+                textBox6.Text = tmp.ReleaseYear;
+                textBox5.Text = tmp.BookCode;
+                dateTimePicker4.Value = tmp.IssueDate;
+                dateTimePicker3.Value = tmp.ReceiveDate;
+                numericUpDown2.Value = tmp.Count;
+            }
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Book tmp = new Book(textBox1.Text, textBox2.Text, textBox3.Text, textBox4.Text, dateTimePicker1.Value, dateTimePicker2.Value, (int)numericUpDown1.Value);
+            books.Add(tmp);
+            UpdateBookGrid();
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            var bookId = Int32.Parse(textBox9.Text);
+            var qr = books.Where(w => w.ID == bookId).Select(w => w).ToList();
+            var tmpBooks = books;
+            foreach (Book item in qr) { 
+                tmpBooks.Remove(item);
+            }
+            books = tmpBooks;
+            UpdateBookGrid();
+            Book.RestoreIndex(books.Last().ID + 1);
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var qr = books.Where(w => w.ID == Int32.Parse(label16.Text)).First();
+            qr.Title = textBox8.Text;
+            qr.Author = textBox7.Text;
+            qr.ReleaseYear = textBox6.Text;
+            qr.BookCode = textBox5.Text;
+            qr.IssueDate = dateTimePicker4.Value;
+            qr.ReceiveDate = dateTimePicker3.Value;
+            qr.Count = (int)numericUpDown2.Value;
+            UpdateBookGrid();
+        }
     }
 }
