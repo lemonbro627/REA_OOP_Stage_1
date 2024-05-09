@@ -11,6 +11,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 
 namespace REA_OOP_Stage_1
 {
@@ -35,18 +36,27 @@ namespace REA_OOP_Stage_1
         private void UpdateBookGrid()
         {
             dataGridView1.Rows.Clear();
-            foreach (Book book in books)
+            foreach (Book tmp in books)
             {
-                dataGridView1.Rows.Add(book.ForDataGrid());
+                dataGridView1.Rows.Add(tmp.ForDataGrid());
             }
         }
 
         private void UpdateReaderGrid()
         {
             dataGridView2.Rows.Clear();
-            foreach (Reader reader in readers)
+            foreach (Reader tmp in readers)
             {
-                dataGridView2.Rows.Add(reader.ForDataGrid());
+                dataGridView2.Rows.Add(tmp.ForDataGrid());
+            }
+        }
+
+        private void UpdateHallGrid()
+        {
+            dataGridView3.Rows.Clear();
+            foreach (Hall tmp in halls)
+            {
+                dataGridView3.Rows.Add(tmp.ForDataGrid());
             }
         }
 
@@ -113,7 +123,6 @@ namespace REA_OOP_Stage_1
             {
                 Book.RestoreIndex(books.Last().ID + 1);
             }
-            UpdateBookGrid();
 
             //Load BooksToReaders
             fname = "data_bookToReaders.bin"; // прописываем путь к файлу
@@ -132,7 +141,6 @@ namespace REA_OOP_Stage_1
             {
                 Reader.RestoreIndex(readers.Last().ID + 1);
             }
-            UpdateReaderGrid();
 
             //Save ReadersToHalls
             fname = "data_readersToHalls.bin"; // прописываем путь к файлу
@@ -147,10 +155,16 @@ namespace REA_OOP_Stage_1
             fs = new FileStream(fname, FileMode.OpenOrCreate);
             halls = (List<Hall>)bf.Deserialize(fs);
             fs.Close();
+            if (halls.Count > 0)
+            {
+                Hall.RestoreIndex(halls.Last().ID + 1);
+            }
             Console.WriteLine("Загружено");
             toolStripStatusLabel1.Text = "Загружено";
 
             UpdateBookGrid();
+            UpdateReaderGrid();
+            UpdateHallGrid();
         }
 
         private void dataGridView1_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -163,11 +177,11 @@ namespace REA_OOP_Stage_1
                 Book tmp = books.Where(w => w.ID == Int32.Parse(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString())).Select(w => w).ToList()[0];
                 textBox8.Text = tmp.Title;
                 textBox7.Text = tmp.Author;
-                textBox6.Text = tmp.ReleaseYear;
-                textBox5.Text = tmp.BookCode;
+                maskedTextBox6.Text = tmp.ReleaseYear;
+                maskedTextBox5.Text = tmp.BookCode;
                 dateTimePicker4.Value = tmp.IssueDate;
                 dateTimePicker3.Value = tmp.ReceiveDate;
-                numericUpDown2.Value = tmp.Count;
+                maskedTextBox4.Text = tmp.Count.ToString();
             }
 
         }
@@ -183,15 +197,31 @@ namespace REA_OOP_Stage_1
                 textBox14.Text = tmp.FullName;
                 numericUpDown4.Value = tmp.TicketNum;
                 dateTimePicker5.Value = tmp.Birthday;
-                textBox12.Text = tmp.Phone;
+                maskedTextBox8.Text = tmp.Phone;
                 textBox11.Text = tmp.Education;
+            }
+
+        }
+
+        private void dataGridView3_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                textBox13.Text = dataGridView3.Rows[e.RowIndex].Cells[0].Value.ToString();
+                label23.Text = dataGridView3.Rows[e.RowIndex].Cells[0].Value.ToString();
+
+                Hall tmp = halls.Where(w => w.ID == Int32.Parse(dataGridView3.Rows[e.RowIndex].Cells[0].Value.ToString())).Select(w => w).ToList()[0];
+                textBox20.Text = tmp.Name;
+                numericUpDown5.Value = tmp.HallNum;
+                textBox17.Text = tmp.Spec;
+                numericUpDown8.Value = tmp.SitCount;
             }
 
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            Book tmp = new Book(textBox1.Text, textBox2.Text, textBox3.Text, textBox4.Text, dateTimePicker1.Value, dateTimePicker2.Value, (int)numericUpDown1.Value);
+            Book tmp = new Book(textBox1.Text, textBox2.Text, maskedTextBox1.Text, maskedTextBox2.Text, dateTimePicker1.Value, dateTimePicker2.Value, Int32.Parse(maskedTextBox3.Text));
             books.Add(tmp);
             UpdateBookGrid();
         }
@@ -206,37 +236,43 @@ namespace REA_OOP_Stage_1
             }
             books = tmpBooks;
             UpdateBookGrid();
-            Book.RestoreIndex(books.Last().ID + 1);
+            if (books.Count > 0) { Book.RestoreIndex(books.Last().ID + 1); }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            var qr = books.Where(w => w.ID == Int32.Parse(label16.Text)).First();
-            qr.Title = textBox8.Text;
-            qr.Author = textBox7.Text;
-            qr.ReleaseYear = textBox6.Text;
-            qr.BookCode = textBox5.Text;
-            qr.IssueDate = dateTimePicker4.Value;
-            qr.ReceiveDate = dateTimePicker3.Value;
-            qr.Count = (int)numericUpDown2.Value;
+            var qr = books.Where(w => w.ID == Int32.Parse(label16.Text));
+            if (books.Count > 0 && qr.ToList().Count > 0)
+            {
+                qr.First().Title = textBox8.Text;
+                qr.First().Author = textBox7.Text;
+                qr.First().ReleaseYear = maskedTextBox6.Text;
+                qr.First().BookCode = maskedTextBox5.Text;
+                qr.First().IssueDate = dateTimePicker4.Value;
+                qr.First().ReceiveDate = dateTimePicker3.Value;
+                qr.First().Count = Int32.Parse(maskedTextBox4.Text);
+            }
             UpdateBookGrid();
         }
 
         private void button6_Click(object sender, EventArgs e)
         {
-            Reader tmp = new Reader(textBox18.Text, (int)numericUpDown3.Value, dateTimePicker7.Value, textBox16.Text, textBox15.Text);
+            Reader tmp = new Reader(textBox18.Text, (int)numericUpDown3.Value, dateTimePicker7.Value, maskedTextBox7.Text, textBox15.Text);
             readers.Add(tmp);
             UpdateReaderGrid();
         }
 
         private void button5_Click(object sender, EventArgs e)
         {
-            var qr = readers.Where(w => w.ID == Int32.Parse(label19.Text)).First();
-            qr.FullName = textBox14.Text;
-            qr.TicketNum = (int)numericUpDown4.Value;
-            qr.Birthday = dateTimePicker5.Value;
-            qr.Phone = textBox12.Text;
-            qr.Education = textBox11.Text;
+            var qr = readers.Where(w => w.ID == Int32.Parse(label19.Text));
+            if (readers.Count > 0 && qr.ToList().Count > 0)
+            {
+                qr.First().FullName = textBox14.Text;
+                qr.First().TicketNum = (int)numericUpDown4.Value;
+                qr.First().Birthday = dateTimePicker5.Value;
+                qr.First().Phone = maskedTextBox8.Text;
+                qr.First().Education = textBox11.Text;
+            }
             UpdateReaderGrid();
         }
 
@@ -251,7 +287,41 @@ namespace REA_OOP_Stage_1
             }
             readers = tmpReaders;
             UpdateReaderGrid();
-            Reader.RestoreIndex(readers.Last().ID + 1);
+            if (readers.Count > 0) { Reader.RestoreIndex(readers.Last().ID + 1); }
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            Hall tmp = new Hall(textBox23.Text, (int)numericUpDown6.Value, textBox22.Text, (int)numericUpDown7.Value);
+            halls.Add(tmp);
+            UpdateHallGrid();
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            var qr = halls.Where(w => w.ID == Int32.Parse(label23.Text));
+            if (halls.Count > 0 && qr.ToList().Count > 0)
+            {
+                qr.First().Name = textBox20.Text;
+                qr.First().HallNum = (int)numericUpDown5.Value;
+                qr.First().Spec = textBox17.Text;
+                qr.First().SitCount = (int)numericUpDown8.Value;
+            }
+            UpdateHallGrid();
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            var hallId = Int32.Parse(textBox13.Text);
+            var qr = halls.Where(w => w.ID == hallId).Select(w => w).ToList();
+            var tmpHalls = halls;
+            foreach (Hall item in qr)
+            {
+                tmpHalls.Remove(item);
+            }
+            halls = tmpHalls;
+            UpdateHallGrid();
+            if (halls.Count > 0) { Hall.RestoreIndex(halls.Last().ID + 1); }
         }
     }
 }
