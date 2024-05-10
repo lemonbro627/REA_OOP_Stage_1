@@ -26,6 +26,8 @@ namespace REA_OOP_Stage_1
         public int SitCount { get; set; } //Количество мест
         private static int size = 0;
 
+        public bool deleted { get; set; } //Статус, false - активна, true - удалена
+
         public Hall(string name, int hallNum, string spec, int sitCount)
         {
             ID = size;
@@ -34,6 +36,7 @@ namespace REA_OOP_Stage_1
             Spec = spec;
             SitCount = sitCount;
             size++;
+            deleted = false;
         }
 
         public static void RestoreIndex(int index)

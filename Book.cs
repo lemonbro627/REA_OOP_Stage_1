@@ -25,22 +25,21 @@ namespace REA_OOP_Stage_1
         public string Author { get; set; } // Автор
         public string ReleaseYear { get; set; } //Год издания
         public string BookCode { get; set; } //Шифр книги
-        public DateTime IssueDate { get; set; } //Дата выдачи
-        public DateTime ReceiveDate { get; set; } //Дата получения
         public int Count { get; set; } //Кол-во экземпляров
         private static int size = 0;
 
-        public Book(string title, string author, string releaseYear, string bookCode, DateTime issueDate, DateTime receiveDate, int count)
+        public bool deleted { get; set; } //Статус, false - активна, true - удалена
+
+        public Book(string title, string author, string releaseYear, string bookCode, int count)
         {
             ID = size;
             Title = title;
             Author = author;
             ReleaseYear = releaseYear;
             BookCode = bookCode;
-            IssueDate = issueDate;
-            ReceiveDate = receiveDate;
             Count = count;
             size++;
+            deleted = false;
         }
 
         public static void RestoreIndex(int index)
@@ -56,8 +55,6 @@ namespace REA_OOP_Stage_1
                 this.Author,
                 this.ReleaseYear,
                 this.BookCode,
-                this.IssueDate.ToLongDateString(),
-                this.ReceiveDate.ToLongDateString(),
                 this.Count.ToString(),
             };
             return tmp;
@@ -72,21 +69,28 @@ namespace REA_OOP_Stage_1
     }
 
     [Serializable]
-    internal class  BookToReader: IComparable<BookToReader>
+    internal class BookToReader: IComparable<BookToReader>
     {
         public int ID { get; set;} //ID
         public int IDBook { get; set;}//ID книги
         public int IDReader { get; set;}//ID читателя
-        public int Count { get; set; }//Количество книг
+        public DateTime IssueDate { get; set; } //Дата выдачи
+        public DateTime? ReceiveDate { get; set; } //Дата получени/возврата
         private static int size = 0;
 
-        public BookToReader(int iDBook, int iDReader, int count)
+        public BookToReader(int iDBook, int iDReader, DateTime issueDate)
         {
             ID = size;
             IDBook = iDBook;
             IDReader = iDReader;
-            Count = count;
+            IssueDate = issueDate;
+            ReceiveDate = null;
             size++;
+        }
+
+        public static void RestoreIndex(int index)
+        {
+            size = index;
         }
 
         public int CompareTo(BookToReader obj)

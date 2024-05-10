@@ -36,27 +36,44 @@ namespace REA_OOP_Stage_1
         private void UpdateBookGrid()
         {
             dataGridView1.Rows.Clear();
-            foreach (Book tmp in books)
+            comboBox1.Items.Clear();
+            foreach (Book tmp in books.Where(w => w.deleted == false).Select(w => w).ToList())
             {
                 dataGridView1.Rows.Add(tmp.ForDataGrid());
+                comboBox1.Items.Add(tmp.Title + " ID: " + tmp.ID.ToString());
             }
         }
 
         private void UpdateReaderGrid()
         {
             dataGridView2.Rows.Clear();
-            foreach (Reader tmp in readers)
+            comboBox2.Items.Clear();
+            foreach (Reader tmp in readers.Where(w => w.deleted == false).Select(w => w).ToList())
             {
                 dataGridView2.Rows.Add(tmp.ForDataGrid());
+                comboBox2.Items.Add(tmp.FullName + " ID: " + tmp.ID.ToString());
             }
         }
 
         private void UpdateHallGrid()
         {
             dataGridView3.Rows.Clear();
-            foreach (Hall tmp in halls)
+            foreach (Hall tmp in halls.Where(w => w.deleted == false).Select(w => w).ToList())
             {
                 dataGridView3.Rows.Add(tmp.ForDataGrid());
+            }
+        }
+
+        private void UpdateBooksToReaderGrid()
+        {
+            dataGridView4.Rows.Clear();
+            foreach (BookToReader tmp in booksToReaders.Select(w => w).ToList())
+            {
+                var readerName = readers.Where(w => w.ID == tmp.IDReader).First().FullName;
+                var bookName = books.Where(w => w.ID == tmp.IDBook).First().Title;
+                string receiveDate = tmp.ReceiveDate.GetValueOrDefault() < tmp.IssueDate ? "" : tmp.ReceiveDate.GetValueOrDefault().ToLongDateString();
+                string[] tmpStr = { tmp.ID.ToString(), readerName, bookName, tmp.IssueDate.ToLongDateString(), receiveDate };
+                dataGridView4.Rows.Add(tmpStr);
             }
         }
 
@@ -130,6 +147,10 @@ namespace REA_OOP_Stage_1
             fs = new FileStream(fname, FileMode.OpenOrCreate);
             booksToReaders = (List<BookToReader>)bf.Deserialize(fs);
             fs.Close();
+            if (booksToReaders.Count > 0)
+            {
+                BookToReader.RestoreIndex(books.Last().ID + 1);
+            }
 
             //Save Readers
             fname = "data_readers.bin"; // прописываем путь к файлу
@@ -163,8 +184,11 @@ namespace REA_OOP_Stage_1
             toolStripStatusLabel1.Text = "Загружено";
 
             UpdateBookGrid();
+            UpdateBooksToReaderGrid();
             UpdateReaderGrid();
             UpdateHallGrid();
+
+            numericUpDown3.Value = numericUpDown3.Minimum + Reader.GetIndex();
         }
 
         private void dataGridView1_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -174,13 +198,11 @@ namespace REA_OOP_Stage_1
                 textBox9.Text = dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString();
                 label16.Text = dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString();
 
-                Book tmp = books.Where(w => w.ID == Int32.Parse(dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString())).Select(w => w).ToList()[0];
+                Book tmp = books.Where(w => w.ID == Int32.Parse(label16.Text)).First();
                 textBox8.Text = tmp.Title;
                 textBox7.Text = tmp.Author;
                 maskedTextBox6.Text = tmp.ReleaseYear;
                 maskedTextBox5.Text = tmp.BookCode;
-                dateTimePicker4.Value = tmp.IssueDate;
-                dateTimePicker3.Value = tmp.ReceiveDate;
                 maskedTextBox4.Text = tmp.Count.ToString();
             }
 
@@ -193,7 +215,7 @@ namespace REA_OOP_Stage_1
                 textBox10.Text = dataGridView2.Rows[e.RowIndex].Cells[0].Value.ToString();
                 label19.Text = dataGridView2.Rows[e.RowIndex].Cells[0].Value.ToString();
 
-                Reader tmp = readers.Where(w => w.ID == Int32.Parse(dataGridView2.Rows[e.RowIndex].Cells[0].Value.ToString())).Select(w => w).ToList()[0];
+                Reader tmp = readers.Where(w => w.ID == Int32.Parse(label19.Text)).First();
                 textBox14.Text = tmp.FullName;
                 numericUpDown4.Value = tmp.TicketNum;
                 dateTimePicker5.Value = tmp.Birthday;
@@ -210,7 +232,7 @@ namespace REA_OOP_Stage_1
                 textBox13.Text = dataGridView3.Rows[e.RowIndex].Cells[0].Value.ToString();
                 label23.Text = dataGridView3.Rows[e.RowIndex].Cells[0].Value.ToString();
 
-                Hall tmp = halls.Where(w => w.ID == Int32.Parse(dataGridView3.Rows[e.RowIndex].Cells[0].Value.ToString())).Select(w => w).ToList()[0];
+                Hall tmp = halls.Where(w => w.ID == Int32.Parse(label23.Text)).First();
                 textBox20.Text = tmp.Name;
                 numericUpDown5.Value = tmp.HallNum;
                 textBox17.Text = tmp.Spec;
@@ -219,9 +241,22 @@ namespace REA_OOP_Stage_1
 
         }
 
+        private void dataGridView4_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                label6.Text = dataGridView3.Rows[e.RowIndex].Cells[0].Value.ToString();
+
+                BookToReader tmp = booksToReaders.Where(w => w.ID == Int32.Parse(label6.Text)).First();
+                textBox5.Text = books.Where(w => w.ID == tmp.IDBook).First().Title;
+                textBox4.Text = readers.Where(w => w.ID == tmp.IDReader).First().FullName;
+            }
+
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
-            Book tmp = new Book(textBox1.Text, textBox2.Text, maskedTextBox1.Text, maskedTextBox2.Text, dateTimePicker1.Value, dateTimePicker2.Value, Int32.Parse(maskedTextBox3.Text));
+            Book tmp = new Book(textBox1.Text, textBox2.Text, maskedTextBox1.Text, maskedTextBox2.Text, Int32.Parse(maskedTextBox3.Text));
             books.Add(tmp);
             UpdateBookGrid();
         }
@@ -230,11 +265,10 @@ namespace REA_OOP_Stage_1
         {
             var bookId = Int32.Parse(textBox9.Text);
             var qr = books.Where(w => w.ID == bookId).Select(w => w).ToList();
-            var tmpBooks = books;
-            foreach (Book item in qr) { 
-                tmpBooks.Remove(item);
+            foreach (Book item in qr)
+            {
+                item.deleted = true;
             }
-            books = tmpBooks;
             UpdateBookGrid();
             if (books.Count > 0) { Book.RestoreIndex(books.Last().ID + 1); }
         }
@@ -248,8 +282,6 @@ namespace REA_OOP_Stage_1
                 qr.First().Author = textBox7.Text;
                 qr.First().ReleaseYear = maskedTextBox6.Text;
                 qr.First().BookCode = maskedTextBox5.Text;
-                qr.First().IssueDate = dateTimePicker4.Value;
-                qr.First().ReceiveDate = dateTimePicker3.Value;
                 qr.First().Count = Int32.Parse(maskedTextBox4.Text);
             }
             UpdateBookGrid();
@@ -259,6 +291,7 @@ namespace REA_OOP_Stage_1
         {
             Reader tmp = new Reader(textBox18.Text, (int)numericUpDown3.Value, dateTimePicker7.Value, maskedTextBox7.Text, textBox15.Text);
             readers.Add(tmp);
+            numericUpDown3.Value = numericUpDown3.Minimum + Reader.GetIndex();
             UpdateReaderGrid();
         }
 
@@ -280,12 +313,10 @@ namespace REA_OOP_Stage_1
         {
             var readerId = Int32.Parse(textBox10.Text);
             var qr = readers.Where(w => w.ID == readerId).Select(w => w).ToList();
-            var tmpReaders = readers;
             foreach (Reader item in qr)
             {
-                tmpReaders.Remove(item);
+                item.deleted = true;
             }
-            readers = tmpReaders;
             UpdateReaderGrid();
             if (readers.Count > 0) { Reader.RestoreIndex(readers.Last().ID + 1); }
         }
@@ -322,6 +353,25 @@ namespace REA_OOP_Stage_1
             halls = tmpHalls;
             UpdateHallGrid();
             if (halls.Count > 0) { Hall.RestoreIndex(halls.Last().ID + 1); }
+        }
+
+        private void button12_Click(object sender, EventArgs e)
+        {
+            var cbx1 = comboBox1.Text.Split(' ');
+            var cbx2 = comboBox2.Text.Split(' ');
+            BookToReader tmp = new BookToReader(Int32.Parse(cbx1.Last()), Int32.Parse(cbx2.Last()), DateTime.Now);
+            booksToReaders.Add(tmp);
+            UpdateBooksToReaderGrid();
+        }
+
+        private void button11_Click(object sender, EventArgs e)
+        {
+            BookToReader tmp = booksToReaders.Where(w => w.ID == Int32.Parse(label6.Text)).First();
+            if (tmp.ReceiveDate == null)
+            {
+                tmp.ReceiveDate = DateTime.Now;
+            }
+            UpdateBooksToReaderGrid();
         }
     }
 }

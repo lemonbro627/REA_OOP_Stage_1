@@ -28,6 +28,8 @@ namespace REA_OOP_Stage_1
         public string Education { get; set; } //Образование
         private static int size = 0;
 
+        public bool deleted { get; set; } //Статус, false - активна, true - удалена
+
         public Reader(string fullName, int ticketNum, DateTime birthday, string phone, string education)
         {
             ID = size;
@@ -37,6 +39,7 @@ namespace REA_OOP_Stage_1
             Phone = phone;
             Education = education;
             size++;
+            deleted = false;
         }
 
         public int CompareTo(Reader obj)
@@ -49,6 +52,11 @@ namespace REA_OOP_Stage_1
         public static void RestoreIndex(int index)
         {
             size = index;
+        }
+
+        public static int GetIndex()
+        {
+            return size;
         }
 
         public string[] ForDataGrid()
