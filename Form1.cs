@@ -37,12 +37,14 @@ namespace REA_OOP_Stage_1
         {
             dataGridView1.Rows.Clear();
             comboBox1.Items.Clear();
+            comboBox7.Items.Clear();
             foreach (Book tmp in books.Where(w => w.deleted == false).Select(w => w).ToList())
             {
                 var book = tmp.ForDataGrid();
                 var free = tmp.Count - booksToReaders.Where(w => w.IDBook == tmp.ID).Where(w => w.ReceiveDate == null).Count();
                 dataGridView1.Rows.Add(book.Append(free.ToString()).ToArray());
                 comboBox1.Items.Add(tmp.Title + " ID: " + tmp.ID.ToString());
+                comboBox7.Items.Add(tmp.Author + " ID Книги: " + tmp.ID.ToString());
             }
         }
 
@@ -65,12 +67,14 @@ namespace REA_OOP_Stage_1
         {
             dataGridView3.Rows.Clear();
             comboBox3.Items.Clear();
+            comboBox6.Items.Clear();
             foreach (Hall tmp in halls.Where(w => w.deleted == false).Select(w => w).ToList())
             {
                 var hall = tmp.ForDataGrid();
                 var free = tmp.SitCount - readerToHalls.Where(w => w.IDHall == tmp.ID).Count();
                 dataGridView3.Rows.Add(hall.Append(free.ToString()).ToArray());
-                comboBox3.Items.Add(tmp.Name + " ID: " + tmp.ID.ToString());
+                comboBox3.Items.Add(tmp.Name + " Зал: " + tmp.HallNum.ToString() + " ID: " + tmp.ID.ToString());
+                comboBox6.Items.Add(tmp.Name + " Зал: " + tmp.HallNum.ToString() + " ID: " + tmp.ID.ToString());
             }
         }
 
@@ -489,6 +493,45 @@ namespace REA_OOP_Stage_1
 
             form.DataGridVisual(readerStr, booksArr);
             form.ShowDialog();
+        }
+
+        private void button15_Click(object sender, EventArgs e)
+        {
+            OneCountBooks form = new OneCountBooks();
+            var lst = books.
+                Where(w => w.Count == 1).
+                Join(
+                    booksToReaders, 
+                    book => book.ID, booksToReader => booksToReader.IDBook, 
+                    (book, booksToReader) => new { bookName = $"{book.Title + " ID: " + book.ID.ToString()}", booksToReader.IDReader }).
+                Join(
+                    readers, 
+                    booksToReader => booksToReader.IDReader, reader => reader.ID, 
+                    (booksToReader, reader) => new { readerName = $"{reader.FullName + " ID: " + reader.ID.ToString()}", booksToReader.bookName }).
+                ToArray();
+
+            form.GridViewVisual(lst);
+            form.ShowDialog();
+        }
+
+        private void button16_Click(object sender, EventArgs e)
+        {
+            var hall = comboBox6.Text.Split(' ').Last();
+            var book = comboBox7.Text.Split(' ').Last();
+            var author = books.Where(w => w.ID == Int32.Parse(book)).First().Author;
+
+            var qr = readerToHalls.
+                Where(w => w.IDHall == Int32.Parse(hall)).
+                Join(
+                    booksToReaders,
+                    readerToHall => readerToHall.IDReader, booksToReader => booksToReader.IDReader,
+                    (readerToHall, booksToReader) => new { booksToReader.IDBook }).
+                Where(w => w.IDBook ==  Int32.Parse(book)).
+                Count();
+
+            var message = $"Кол-во книг автора {author} в зале {comboBox6.Text} - {qr}";
+            var caption = "Кол-во книг автора в зале";
+            MessageBox.Show(message, caption, MessageBoxButtons.OK);
         }
     }
 }
