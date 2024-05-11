@@ -81,12 +81,20 @@ namespace REA_OOP_Stage_1
         public int IDHall { get; set; }
         private static int size = 0;
 
+        public bool deleted { get; set; } //Статус, false - активна, true - удалена
+
         public ReaderToHall(int iDReader, int iDHall)
         {
             ID = size;
             IDReader = iDReader;
             IDHall = iDHall;
             size++;
+            deleted = false;
+        }
+
+        public static void RestoreIndex(int index)
+        {
+            size = index;
         }
 
         public int CompareTo(ReaderToHall obj)
