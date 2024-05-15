@@ -59,12 +59,12 @@ namespace REA_OOP_Stage_1
             return size;
         }
 
-        public string[] ForDataGrid()
+        public object[] ForDataGrid()
         {
-            string[] tmp = {
-                this.ID.ToString(),
+            object[] tmp = {
+                this.ID,
                 this.FullName,
-                this.TicketNum.ToString(),
+                this.TicketNum,
                 this.Birthday.ToLongDateString(),
                 this.Phone,
                 this.Education

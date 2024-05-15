@@ -47,15 +47,15 @@ namespace REA_OOP_Stage_1
             size = index;
         }
 
-        public string[] ForDataGrid()
+        public object[] ForDataGrid()
         {
-            string[] tmp = {
-                this.ID.ToString(),
+            object[] tmp = {
+                this.ID,
                 this.Title,
                 this.Author,
                 this.ReleaseYear,
                 this.BookCode,
-                this.Count.ToString(),
+                this.Count,
             };
             return tmp;
         }

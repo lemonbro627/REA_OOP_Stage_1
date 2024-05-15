@@ -44,14 +44,14 @@ namespace REA_OOP_Stage_1
             size = index;
         }
 
-        public string[] ForDataGrid()
+        public object[] ForDataGrid()
         {
-            string[] tmp = {
-                this.ID.ToString(),
+            object[] tmp = {
+                this.ID,
                 this.Name,
-                this.HallNum.ToString(),
+                this.HallNum,
                 this.Spec,
-                this.SitCount.ToString()
+                this.SitCount
             };
             return tmp;
         }

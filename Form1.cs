@@ -34,16 +34,31 @@ namespace REA_OOP_Stage_1
             
         }
 
+        private float GetMaxBooksGet()
+        {
+            float maxGets = 1.0F;
+            foreach (Book tmp in books.Where(w => w.deleted == false).Select(w => w).ToList())
+            {
+                var gets = booksToReaders.Where(w => w.IDBook == tmp.ID).Count();
+                if (gets > maxGets) { maxGets = (float)gets; }
+            }
+            return maxGets;
+        }
+
         private void UpdateBookGrid()
         {
             dataGridView1.Rows.Clear();
             comboBox1.Items.Clear();
             comboBox7.Items.Clear();
+            var maxGets = GetMaxBooksGet();
             foreach (Book tmp in books.Where(w => w.deleted == false).Select(w => w).ToList())
             {
                 var book = tmp.ForDataGrid();
                 var free = tmp.Count - booksToReaders.Where(w => w.IDBook == tmp.ID).Where(w => w.ReceiveDate == null).Count();
-                dataGridView1.Rows.Add(book.Append(free.ToString()).ToArray());
+                var gets = booksToReaders.Where(w => w.IDBook == tmp.ID).Count();
+                book = book.Append(free).ToArray();
+                book = book.Append(5*Math.Round(gets / maxGets, 1)).ToArray();
+                dataGridView1.Rows.Add(book);
                 comboBox1.Items.Add(tmp.Title + " ID: " + tmp.ID.ToString());
                 comboBox7.Items.Add(tmp.Author + " ID Книги: " + tmp.ID.ToString());
             }
@@ -71,7 +86,7 @@ namespace REA_OOP_Stage_1
             {
                 var hall = tmp.ForDataGrid();
                 var free = tmp.SitCount - readerToHalls.Where(w => w.IDHall == tmp.ID).Count();
-                dataGridView3.Rows.Add(hall.Append(free.ToString()).ToArray());
+                dataGridView3.Rows.Add(hall.Append(free).ToArray());
                 comboBox3.Items.Add(tmp.Name + " Зал: " + tmp.HallNum.ToString() + " ID: " + tmp.ID.ToString());
                 comboBox6.Items.Add(tmp.Name + " Зал: " + tmp.HallNum.ToString() + " ID: " + tmp.ID.ToString());
             }
@@ -85,7 +100,7 @@ namespace REA_OOP_Stage_1
                 var reader = readers.Where(w => w.ID == tmp.IDReader).First();
                 var book = books.Where(w => w.ID == tmp.IDBook).First();
                 string receiveDate = tmp.ReceiveDate.GetValueOrDefault() < tmp.IssueDate ? "" : tmp.ReceiveDate.GetValueOrDefault().ToLongDateString();
-                string[] tmpStr = { tmp.ID.ToString(), reader.FullName + " ID: " + reader.ID.ToString(), book.Title + " ID: " + book.ID.ToString(), tmp.IssueDate.ToLongDateString(), receiveDate };
+                object[] tmpStr = { tmp.ID, reader.FullName + " ID: " + reader.ID.ToString(), book.Title + " ID: " + book.ID.ToString(), tmp.IssueDate.ToLongDateString(), receiveDate };
                 dataGridView4.Rows.Add(tmpStr);
             }
         }
@@ -97,7 +112,7 @@ namespace REA_OOP_Stage_1
             {
                 var reader = readers.Where(w => w.ID == tmp.IDReader).First();
                 var hall = halls.Where(w => w.ID == tmp.IDHall).First();
-                string[] tmpStr = { tmp.ID.ToString(), reader.FullName + " ID: " + reader.ID.ToString(), hall.Name + " ID: " + hall.ID.ToString() };
+                object[] tmpStr = { tmp.ID, reader.FullName + " ID: " + reader.ID.ToString(), hall.Name + " ID: " + hall.ID.ToString() };
                 dataGridView5.Rows.Add(tmpStr);
             }
         }
