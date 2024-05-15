@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -53,13 +54,11 @@ namespace REA_OOP_Stage_1
             dataGridView2.Rows.Clear();
             comboBox2.Items.Clear();
             comboBox4.Items.Clear();
-            comboBox5.Items.Clear();
             foreach (Reader tmp in readers.Where(w => w.deleted == false).Select(w => w).ToList())
             {
                 dataGridView2.Rows.Add(tmp.ForDataGrid());
                 comboBox2.Items.Add(tmp.FullName + " ID: " + tmp.ID.ToString());
                 comboBox4.Items.Add(tmp.FullName + " ID: " + tmp.ID.ToString());
-                comboBox5.Items.Add(tmp.FullName + " ID: " + tmp.ID.ToString());
             }
         }
 
@@ -371,8 +370,16 @@ namespace REA_OOP_Stage_1
         {
             var readerId = Int32.Parse(textBox10.Text);
             var qr = readers.Where(w => w.ID == readerId).First();
-            qr.deleted = true;
-            UpdateReaderGrid();
+            if (booksToReaders.Where(w => w.IDReader == readerId).Count() == 0)
+            {
+                errorProvider1.SetError(this.button4, String.Empty);
+                qr.deleted = true;
+                UpdateReaderGrid();
+            }
+            else
+            {
+                errorProvider1.SetError(this.button4, "У читателя имеются не возвращённые книги");
+            }
             if (readers.Count > 0) { Reader.RestoreIndex(readers.Last().ID + 1); }
         }
 
@@ -479,9 +486,9 @@ namespace REA_OOP_Stage_1
         {
             BooksOfReader form = new BooksOfReader();
 
-            var reader = comboBox5.Text.Split(' ');
+            var reader = label19.Text;
 
-            Reader r = readers.Where(w => w.ID == Int32.Parse(reader.Last())).First();
+            Reader r = readers.Where(w => w.ID == Int32.Parse(reader)).First();
             var readerStr = r.FullName + " ID: " + r.ID.ToString();
             var booksArr = booksToReaders.
                 Where(w => w.IDReader == r.ID).
@@ -516,22 +523,27 @@ namespace REA_OOP_Stage_1
 
         private void button16_Click(object sender, EventArgs e)
         {
-            var hall = comboBox6.Text.Split(' ').Last();
-            var book = comboBox7.Text.Split(' ').Last();
-            var author = books.Where(w => w.ID == Int32.Parse(book)).First().Author;
+            if (comboBox6.Items.Contains(comboBox6.Text) && comboBox7.Items.Contains(comboBox7.Text))
+            {
+                var hall = comboBox6.Text.Split(' ');
+                var book = comboBox7.Text.Split(' ');
+                var hallId = Int32.Parse(hall.Last());
+                var bookId = Int32.Parse(book.Last());
+                var author = books.Where(w => w.ID == Int32.Parse(book.Last())).First().Author;
 
-            var qr = readerToHalls.
-                Where(w => w.IDHall == Int32.Parse(hall)).
-                Join(
-                    booksToReaders,
-                    readerToHall => readerToHall.IDReader, booksToReader => booksToReader.IDReader,
-                    (readerToHall, booksToReader) => new { booksToReader.IDBook }).
-                Where(w => w.IDBook ==  Int32.Parse(book)).
-                Count();
+                var qr = readerToHalls.
+                    Where(w => w.IDHall == Int32.Parse(hall.Last())).
+                    Join(
+                        booksToReaders,
+                        readerToHall => readerToHall.IDReader, booksToReader => booksToReader.IDReader,
+                        (readerToHall, booksToReader) => new { booksToReader.IDBook }).
+                    Where(w => w.IDBook == Int32.Parse(book.Last())).
+                    Count();
 
-            var message = $"Кол-во книг автора {author} в зале {comboBox6.Text} - {qr}";
-            var caption = "Кол-во книг автора в зале";
-            MessageBox.Show(message, caption, MessageBoxButtons.OK);
+                var message = $"Кол-во книг автора {author} в зале {comboBox6.Text} - {qr}";
+                var caption = "Кол-во книг автора в зале";
+                MessageBox.Show(message, caption, MessageBoxButtons.OK);
+            }
         }
     }
 }
