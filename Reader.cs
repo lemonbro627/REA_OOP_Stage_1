@@ -49,14 +49,9 @@ namespace REA_OOP_Stage_1
             return 0;
         }
 
-        public static void RestoreIndex(int index)
-        {
-            size = index;
-        }
-
-        public static int GetIndex()
-        {
-            return size;
+        public static int Index {
+            set => size = value;
+            get => size; 
         }
 
         public object[] ForDataGrid()
@@ -77,24 +72,24 @@ namespace REA_OOP_Stage_1
     internal class ReaderToHall : IComparable<ReaderToHall>
     {
         public int ID { get; set; }
-        public int IDReader { get; set; }
-        public int IDHall { get; set; }
+        public int ReaderId { get; set; }
+        public int HallId { get; set; }
         private static int size = 0;
 
         public bool deleted { get; set; } //Статус, false - активна, true - удалена
 
-        public ReaderToHall(int iDReader, int iDHall)
+        public ReaderToHall(int readerId, int hallId)
         {
             ID = size;
-            IDReader = iDReader;
-            IDHall = iDHall;
+            ReaderId = readerId;
+            HallId = hallId;
             size++;
             deleted = false;
         }
 
-        public static void RestoreIndex(int index)
+        public static int Index
         {
-            size = index;
+            set => size = value;
         }
 
         public int CompareTo(ReaderToHall obj)

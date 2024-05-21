@@ -39,7 +39,7 @@ namespace REA_OOP_Stage_1
             float maxGets = 1.0F;
             foreach (Book tmp in books.Where(w => w.deleted == false).Select(w => w).ToList())
             {
-                var gets = booksToReaders.Where(w => w.IDBook == tmp.ID).Count();
+                var gets = booksToReaders.Where(w => w.BookId == tmp.ID).Count();
                 if (gets > maxGets) { maxGets = (float)gets; }
             }
             return maxGets;
@@ -54,8 +54,8 @@ namespace REA_OOP_Stage_1
             foreach (Book tmp in books.Where(w => w.deleted == false).Select(w => w).ToList())
             {
                 var book = tmp.ForDataGrid();
-                var free = tmp.Count - booksToReaders.Where(w => w.IDBook == tmp.ID).Where(w => w.ReceiveDate == null).Count();
-                var gets = booksToReaders.Where(w => w.IDBook == tmp.ID).Count();
+                var free = tmp.Count - booksToReaders.Where(w => w.BookId == tmp.ID).Where(w => w.ReceiveDate == null).Count();
+                var gets = booksToReaders.Where(w => w.BookId == tmp.ID).Count();
                 book = book.Append(free).ToArray();
                 book = book.Append(5*Math.Round(gets / maxGets, 1)).ToArray();
                 dataGridView1.Rows.Add(book);
@@ -85,7 +85,7 @@ namespace REA_OOP_Stage_1
             foreach (Hall tmp in halls.Where(w => w.deleted == false).Select(w => w).ToList())
             {
                 var hall = tmp.ForDataGrid();
-                var free = tmp.SitCount - readerToHalls.Where(w => w.IDHall == tmp.ID).Count();
+                var free = tmp.SitCount - readerToHalls.Where(w => w.HallId == tmp.ID).Count();
                 dataGridView3.Rows.Add(hall.Append(free).ToArray());
                 comboBox3.Items.Add(tmp.Name + " Зал: " + tmp.HallNum.ToString() + " ID: " + tmp.ID.ToString());
                 comboBox6.Items.Add(tmp.Name + " Зал: " + tmp.HallNum.ToString() + " ID: " + tmp.ID.ToString());
@@ -97,8 +97,8 @@ namespace REA_OOP_Stage_1
             dataGridView4.Rows.Clear();
             foreach (BookToReader tmp in booksToReaders.Select(w => w).ToList())
             {
-                var reader = readers.Where(w => w.ID == tmp.IDReader).First();
-                var book = books.Where(w => w.ID == tmp.IDBook).First();
+                var reader = readers.Where(w => w.ID == tmp.ReaderId).First();
+                var book = books.Where(w => w.ID == tmp.BookId).First();
                 string receiveDate = tmp.ReceiveDate.GetValueOrDefault() < tmp.IssueDate ? "" : tmp.ReceiveDate.GetValueOrDefault().ToLongDateString();
                 object[] tmpStr = { tmp.ID, reader.FullName + " ID: " + reader.ID.ToString(), book.Title + " ID: " + book.ID.ToString(), tmp.IssueDate.ToLongDateString(), receiveDate };
                 dataGridView4.Rows.Add(tmpStr);
@@ -110,8 +110,8 @@ namespace REA_OOP_Stage_1
             dataGridView5.Rows.Clear();
             foreach (ReaderToHall tmp in readerToHalls.Where(w => w.deleted == false).Select(w => w).ToList())
             {
-                var reader = readers.Where(w => w.ID == tmp.IDReader).First();
-                var hall = halls.Where(w => w.ID == tmp.IDHall).First();
+                var reader = readers.Where(w => w.ID == tmp.ReaderId).First();
+                var hall = halls.Where(w => w.ID == tmp.HallId).First();
                 object[] tmpStr = { tmp.ID, reader.FullName + " ID: " + reader.ID.ToString(), hall.Name + " ID: " + hall.ID.ToString() };
                 dataGridView5.Rows.Add(tmpStr);
             }
@@ -178,7 +178,7 @@ namespace REA_OOP_Stage_1
             fs.Close();
             if (books.Count > 0)
             {
-                Book.RestoreIndex(books.Last().ID + 1);
+                Book.Index = books.Last().ID + 1;
             }
 
             //Load BooksToReaders
@@ -189,7 +189,7 @@ namespace REA_OOP_Stage_1
             fs.Close();
             if (booksToReaders.Count > 0)
             {
-                BookToReader.RestoreIndex(booksToReaders.Last().ID + 1);
+                BookToReader.Index = booksToReaders.Last().ID + 1;
             }
 
             //Save Readers
@@ -200,7 +200,7 @@ namespace REA_OOP_Stage_1
             fs.Close();
             if (readers.Count > 0)
             {
-                Reader.RestoreIndex(readers.Last().ID + 1);
+                Reader.Index = readers.Last().ID + 1;
             }
 
             //Save ReadersToHalls
@@ -211,7 +211,7 @@ namespace REA_OOP_Stage_1
             fs.Close();
             if (readerToHalls.Count > 0)
             {
-                ReaderToHall.RestoreIndex(readerToHalls.Last().ID + 1);
+                ReaderToHall.Index = readerToHalls.Last().ID + 1;
             }
 
             //Save Halls
@@ -222,7 +222,7 @@ namespace REA_OOP_Stage_1
             fs.Close();
             if (halls.Count > 0)
             {
-                Hall.RestoreIndex(halls.Last().ID + 1);
+                Hall.Index = halls.Last().ID + 1;
             }
             Console.WriteLine("Загружено");
             toolStripStatusLabel1.Text = "Загружено";
@@ -233,7 +233,7 @@ namespace REA_OOP_Stage_1
             UpdateReadersToHallGrid();
             UpdateHallGrid();
 
-            numericUpDown3.Value = numericUpDown3.Minimum + Reader.GetIndex();
+            numericUpDown3.Value = numericUpDown3.Minimum + Reader.Index;
         }
 
         private void dataGridView1_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -293,8 +293,8 @@ namespace REA_OOP_Stage_1
                 label6.Text = dataGridView4.Rows[e.RowIndex].Cells[0].Value.ToString();
 
                 BookToReader tmp = booksToReaders.Where(w => w.ID == Int32.Parse(label6.Text)).First();
-                textBox5.Text = books.Where(w => w.ID == tmp.IDBook).First().Title;
-                textBox4.Text = readers.Where(w => w.ID == tmp.IDReader).First().FullName;
+                textBox5.Text = books.Where(w => w.ID == tmp.BookId).First().Title;
+                textBox4.Text = readers.Where(w => w.ID == tmp.ReaderId).First().FullName;
             }
 
         }
@@ -306,8 +306,8 @@ namespace REA_OOP_Stage_1
                 label5.Text = dataGridView5.Rows[e.RowIndex].Cells[0].Value.ToString();
 
                 ReaderToHall tmp = readerToHalls.Where(w => w.ID == Int32.Parse(label5.Text)).First();
-                textBox6.Text = readers.Where(w => w.ID == tmp.IDReader).First().FullName;
-                textBox3.Text = halls.Where(w => w.ID == tmp.IDHall).First().Name;
+                textBox6.Text = readers.Where(w => w.ID == tmp.ReaderId).First().FullName;
+                textBox3.Text = halls.Where(w => w.ID == tmp.HallId).First().Name;
             }
 
         }
@@ -322,7 +322,7 @@ namespace REA_OOP_Stage_1
         private void button3_Click(object sender, EventArgs e)
         {
             var bookId = Int32.Parse(textBox9.Text);
-            var free = books.Where(w => w.ID == bookId).First().Count - booksToReaders.Where(w => w.IDBook == bookId).Where(w => w.ReceiveDate == null).Count();
+            var free = books.Where(w => w.ID == bookId).First().Count - booksToReaders.Where(w => w.BookId == bookId).Where(w => w.ReceiveDate == null).Count();
             var qr = books.Where(w => w.ID == bookId).Select(w => w).First();
             if (free == qr.Count)
             {
@@ -333,7 +333,7 @@ namespace REA_OOP_Stage_1
             {
                 errorProvider1.SetError(this.button3, "Имеются не возвращённые экземпляры");
             }
-            if (books.Count > 0) { Book.RestoreIndex(books.Last().ID + 1); }
+            if (books.Count > 0) { Book.Index = books.Last().ID + 1; }
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -358,7 +358,7 @@ namespace REA_OOP_Stage_1
             {
                 errorProvider1.SetError(this.button6, String.Empty);
                 readers.Add(tmp);
-                numericUpDown3.Value = numericUpDown3.Minimum + Reader.GetIndex();
+                numericUpDown3.Value = numericUpDown3.Minimum + Reader.Index;
             }
             else
             {
@@ -385,7 +385,7 @@ namespace REA_OOP_Stage_1
         {
             var readerId = Int32.Parse(textBox10.Text);
             var qr = readers.Where(w => w.ID == readerId).First();
-            if (booksToReaders.Where(w => w.IDReader == readerId).Count() == 0)
+            if (booksToReaders.Where(w => w.ReaderId == readerId).Count() == 0)
             {
                 errorProvider1.SetError(this.button4, String.Empty);
                 qr.deleted = true;
@@ -395,13 +395,13 @@ namespace REA_OOP_Stage_1
             {
                 errorProvider1.SetError(this.button4, "У читателя имеются не возвращённые книги");
             }
-            if (readers.Count > 0) { Reader.RestoreIndex(readers.Last().ID + 1); }
+            if (readers.Count > 0) { Reader.Index = readers.Last().ID + 1; }
         }
 
         private void button9_Click(object sender, EventArgs e)
         {
             Hall tmp = new Hall(textBox23.Text, (int)numericUpDown6.Value, textBox22.Text, (int)numericUpDown7.Value);
-            var free = tmp.SitCount - readerToHalls.Where(w => w.IDHall == tmp.ID).Count();
+            var free = tmp.SitCount - readerToHalls.Where(w => w.HallId == tmp.ID).Count();
             halls.Add(tmp);
             UpdateHallGrid();
 
@@ -424,7 +424,7 @@ namespace REA_OOP_Stage_1
         {
             var hallId = Int32.Parse(textBox13.Text);
             var qr = halls.Where(w => w.ID == hallId).First();
-            var free = qr.SitCount - readerToHalls.Where(w => w.IDHall == qr.ID).Count();
+            var free = qr.SitCount - readerToHalls.Where(w => w.HallId == qr.ID).Count();
             if (free == qr.SitCount)
             {
                 errorProvider1.SetError(this.button7, String.Empty);
@@ -434,14 +434,20 @@ namespace REA_OOP_Stage_1
             {
                 errorProvider1.SetError(this.button7, "В зале имеются не выписанные читатели");
             }
-            if (halls.Count > 0) { Hall.RestoreIndex(halls.Last().ID + 1); }
+            if (halls.Count > 0) { Hall.Index = halls.Last().ID + 1; }
         }
 
         private void button12_Click(object sender, EventArgs e)
         {
             var book = comboBox1.Text.Split(' ');
             var reader = comboBox2.Text.Split(' ');
-            var free = books.Where(w => w.ID == Int32.Parse(book.Last())).First().Count - booksToReaders.Where(w => w.IDBook == Int32.Parse(book.Last())).Where(w => w.ReceiveDate == null).Count();
+            var free = books.
+                Where(w => w.ID == Int32.Parse(book.Last())).
+                First().
+                Count - booksToReaders.
+                Where(w => w.BookId == Int32.Parse(book.Last())).
+                Where(w => w.ReceiveDate == null).
+                Count();
             if (free > 0)
             {
                 errorProvider1.SetError(this.button12, String.Empty);
@@ -471,8 +477,8 @@ namespace REA_OOP_Stage_1
             var reader = comboBox4.Text.Split(' ');
             var hall = comboBox3.Text.Split(' ');
             ReaderToHall tmp = new ReaderToHall(Int32.Parse(reader.Last()), Int32.Parse(hall.Last()));
-            var free = halls.Where(w => w.ID == Int32.Parse(hall.Last())).First().SitCount - readerToHalls.Where(w => w.IDHall == Int32.Parse(hall.Last())).Count();
-            var checkDouble = readerToHalls.Where(w => w.IDHall == Int32.Parse(hall.Last())).Where(w => w.IDReader == Int32.Parse(reader.Last())).Count();
+            var free = halls.Where(w => w.ID == Int32.Parse(hall.Last())).First().SitCount - readerToHalls.Where(w => w.HallId == Int32.Parse(hall.Last())).Count();
+            var checkDouble = readerToHalls.Where(w => w.HallId == Int32.Parse(hall.Last())).Where(w => w.ReaderId == Int32.Parse(reader.Last())).Count();
             if (free > 0 && checkDouble == 0)
             {
                 errorProvider1.SetError(this.button13, String.Empty);
@@ -506,10 +512,10 @@ namespace REA_OOP_Stage_1
             Reader r = readers.Where(w => w.ID == Int32.Parse(reader)).First();
             var readerStr = r.FullName + " ID: " + r.ID.ToString();
             var booksArr = booksToReaders.
-                Where(w => w.IDReader == r.ID).
+                Where(w => w.ReaderId == r.ID).
                 Join(
                     books, 
-                    booksToReader => booksToReader.IDBook, book => book.ID, 
+                    booksToReader => booksToReader.BookId, book => book.ID, 
                     (booksToReader, book) => new { BookName = $"{book.Title + " ID: " + book.ID.ToString()}" }).
                ToArray();
 
@@ -524,11 +530,11 @@ namespace REA_OOP_Stage_1
                 Where(w => w.Count == 1).
                 Join(
                     booksToReaders, 
-                    book => book.ID, booksToReader => booksToReader.IDBook, 
-                    (book, booksToReader) => new { bookName = $"{book.Title + " ID: " + book.ID.ToString()}", booksToReader.IDReader }).
+                    book => book.ID, booksToReader => booksToReader.BookId, 
+                    (book, booksToReader) => new { bookName = $"{book.Title + " ID: " + book.ID.ToString()}", booksToReader.ReaderId }).
                 Join(
                     readers, 
-                    booksToReader => booksToReader.IDReader, reader => reader.ID, 
+                    booksToReader => booksToReader.ReaderId, reader => reader.ID, 
                     (booksToReader, reader) => new { readerName = $"{reader.FullName + " ID: " + reader.ID.ToString()}", booksToReader.bookName }).
                 ToArray();
 
@@ -547,12 +553,12 @@ namespace REA_OOP_Stage_1
                 var author = books.Where(w => w.ID == Int32.Parse(book.Last())).First().Author;
 
                 var qr = readerToHalls.
-                    Where(w => w.IDHall == Int32.Parse(hall.Last())).
+                    Where(w => w.HallId == Int32.Parse(hall.Last())).
                     Join(
                         booksToReaders,
-                        readerToHall => readerToHall.IDReader, booksToReader => booksToReader.IDReader,
-                        (readerToHall, booksToReader) => new { booksToReader.IDBook }).
-                    Where(w => w.IDBook == Int32.Parse(book.Last())).
+                        readerToHall => readerToHall.ReaderId, booksToReader => booksToReader.ReaderId,
+                        (readerToHall, booksToReader) => new { booksToReader.BookId }).
+                    Where(w => w.BookId == Int32.Parse(book.Last())).
                     Count();
 
                 var message = $"Кол-во книг автора {author} в зале {comboBox6.Text} - {qr}";

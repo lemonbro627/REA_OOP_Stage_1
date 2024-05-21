@@ -42,9 +42,9 @@ namespace REA_OOP_Stage_1
             deleted = false;
         }
 
-        public static void RestoreIndex(int index)
+        public static int Index
         {
-            size = index;
+            set => size = value;
         }
 
         public object[] ForDataGrid()
@@ -72,25 +72,25 @@ namespace REA_OOP_Stage_1
     internal class BookToReader: IComparable<BookToReader>
     {
         public int ID { get; set;} //ID
-        public int IDBook { get; set;}//ID книги
-        public int IDReader { get; set;}//ID читателя
+        public int BookId { get; set;}//ID книги
+        public int ReaderId { get; set;}//ID читателя
         public DateTime IssueDate { get; set; } //Дата выдачи
         public DateTime? ReceiveDate { get; set; } //Дата получени/возврата
         private static int size = 0;
 
-        public BookToReader(int iDBook, int iDReader, DateTime issueDate)
+        public BookToReader(int bookId, int readerId, DateTime issueDate)
         {
             ID = size;
-            IDBook = iDBook;
-            IDReader = iDReader;
+            BookId = bookId;
+            ReaderId = readerId;
             IssueDate = issueDate;
             ReceiveDate = null;
             size++;
         }
 
-        public static void RestoreIndex(int index)
+        public static int Index
         {
-            size = index;
+            set => size = value;
         }
 
         public int CompareTo(BookToReader obj)

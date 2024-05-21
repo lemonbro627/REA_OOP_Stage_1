@@ -39,9 +39,9 @@ namespace REA_OOP_Stage_1
             deleted = false;
         }
 
-        public static void RestoreIndex(int index)
+        public static int Index
         {
-            size = index;
+            set => size = value;
         }
 
         public object[] ForDataGrid()
