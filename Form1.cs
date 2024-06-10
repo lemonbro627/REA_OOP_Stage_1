@@ -222,57 +222,77 @@ namespace REA_OOP_Stage_1
 
             //Load Books
             fname = "data_book.bin"; // прописываем путь к файлу
-            bf = new BinaryFormatter(); // создаём объект класса BinaryFormatter
-            fs = new FileStream(fname, FileMode.OpenOrCreate); // открываем файл
-            books = (List<Book>)bf.Deserialize(fs); // десереализуем данные из файла
-            fs.Close(); // закрываем файл
-            if (books.Count > 0) // если файл не пустой - необходимо восстановить индекс
+            // загружаем данные, только если файл существует
+            if (File.Exists(fname))
             {
-                Book.Index = books.Last().ID + 1; // берём ID самое последней записи, делаем +1 и записываем как индекс
+                bf = new BinaryFormatter(); // создаём объект класса BinaryFormatter
+                fs = new FileStream(fname, FileMode.OpenOrCreate); // открываем файл
+                books = (List<Book>)bf.Deserialize(fs); // десереализуем данные из файла
+                fs.Close(); // закрываем файл
+                if (books.Count > 0) // если файл не пустой - необходимо восстановить индекс
+                {
+                    Book.Index = books.Last().ID + 1; // берём ID самое последней записи, делаем +1 и записываем как индекс
+                }
             }
 
             //Load BooksToReaders
             fname = "data_bookToReaders.bin"; // прописываем путь к файлу
-            bf = new BinaryFormatter(); // создаём объект класса BinaryFormatter
-            fs = new FileStream(fname, FileMode.OpenOrCreate); // открываем файл
-            booksToReaders = (List<BookToReader>)bf.Deserialize(fs); // десереализуем данные из файла
-            fs.Close(); // закрываем файл
-            if (booksToReaders.Count > 0) // если файл не пустой - необходимо восстановить индекс
+            // загружаем данные, только если файл существует
+            if (File.Exists(fname))
             {
-                BookToReader.Index = booksToReaders.Last().ID + 1; // берём ID самое последней записи, делаем +1 и записываем как индекс
+                bf = new BinaryFormatter(); // создаём объект класса BinaryFormatter
+                fs = new FileStream(fname, FileMode.OpenOrCreate); // открываем файл
+                booksToReaders = (List<BookToReader>)bf.Deserialize(fs); // десереализуем данные из файла
+                fs.Close(); // закрываем файл
+                if (booksToReaders.Count > 0) // если файл не пустой - необходимо восстановить индекс
+                {
+                    BookToReader.Index = booksToReaders.Last().ID + 1; // берём ID самое последней записи, делаем +1 и записываем как индекс
+                }
             }
 
             //Save Readers
             fname = "data_readers.bin"; // прописываем путь к файлу
-            bf = new BinaryFormatter(); // создаём объект класса BinaryFormatter
-            fs = new FileStream(fname, FileMode.OpenOrCreate); // открываем файл
-            readers = (List<Reader>)bf.Deserialize(fs); // десереализуем данные из файла
-            fs.Close(); // закрываем файл
-            if (readers.Count > 0) // если файл не пустой - необходимо восстановить индекс
+            // загружаем данные, только если файл существует
+            if (File.Exists(fname))
             {
-                Reader.Index = readers.Last().ID + 1; // берём ID самое последней записи, делаем +1 и записываем как индекс
+                bf = new BinaryFormatter(); // создаём объект класса BinaryFormatter
+                fs = new FileStream(fname, FileMode.OpenOrCreate); // открываем файл
+                readers = (List<Reader>)bf.Deserialize(fs); // десереализуем данные из файла
+                fs.Close(); // закрываем файл
+                if (readers.Count > 0) // если файл не пустой - необходимо восстановить индекс
+                {
+                    Reader.Index = readers.Last().ID + 1; // берём ID самое последней записи, делаем +1 и записываем как индекс
+                }
             }
 
             //Save ReadersToHalls
             fname = "data_readersToHalls.bin"; // прописываем путь к файлу
-            bf = new BinaryFormatter(); // создаём объект класса BinaryFormatter
-            fs = new FileStream(fname, FileMode.OpenOrCreate); // открываем файл
-            readerToHalls = (List<ReaderToHall>)bf.Deserialize(fs); // десереализуем данные из файла
-            fs.Close(); // закрываем файл
-            if (readerToHalls.Count > 0) // если файл не пустой - необходимо восстановить индекс
+            // загружаем данные, только если файл существует
+            if (File.Exists(fname))
             {
-                ReaderToHall.Index = readerToHalls.Last().ID + 1; // берём ID самое последней записи, делаем +1 и записываем как индекс
+                bf = new BinaryFormatter(); // создаём объект класса BinaryFormatter
+                fs = new FileStream(fname, FileMode.OpenOrCreate); // открываем файл
+                readerToHalls = (List<ReaderToHall>)bf.Deserialize(fs); // десереализуем данные из файла
+                fs.Close(); // закрываем файл
+                if (readerToHalls.Count > 0) // если файл не пустой - необходимо восстановить индекс
+                {
+                    ReaderToHall.Index = readerToHalls.Last().ID + 1; // берём ID самое последней записи, делаем +1 и записываем как индекс
+                }
             }
 
             //Save Halls
             fname = "data_halls.bin"; // прописываем путь к файлу
-            bf = new BinaryFormatter(); // создаём объект класса BinaryFormatter
-            fs = new FileStream(fname, FileMode.OpenOrCreate); // открываем файл
-            halls = (List<Hall>)bf.Deserialize(fs); // десереализуем данные из файла
-            fs.Close(); // закрываем файл
-            if (halls.Count > 0) // если файл не пустой - необходимо восстановить индекс
+            // загружаем данные, только если файл существует
+            if (File.Exists(fname))
             {
-                Hall.Index = halls.Last().ID + 1; // берём ID самое последней записи, делаем +1 и записываем как индекс
+                bf = new BinaryFormatter(); // создаём объект класса BinaryFormatter
+                fs = new FileStream(fname, FileMode.OpenOrCreate); // открываем файл
+                halls = (List<Hall>)bf.Deserialize(fs); // десереализуем данные из файла
+                fs.Close(); // закрываем файл
+                if (halls.Count > 0) // если файл не пустой - необходимо восстановить индекс
+                {
+                    Hall.Index = halls.Last().ID + 1; // берём ID самое последней записи, делаем +1 и записываем как индекс
+                }
             }
             Console.WriteLine("Загружено");
             toolStripStatusLabel1.Text = "Загружено";

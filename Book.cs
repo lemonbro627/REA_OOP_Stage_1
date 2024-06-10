@@ -20,16 +20,17 @@ namespace REA_OOP_Stage_1
     [Serializable]
     internal class Book: IComparable<Book>
     {
-        public int ID { get; set; } //Ключ
-        public string Title { get; set; } //Название
+        public int ID { get; set; } //ID книги
+        public string Title { get; set; } //Название книги
         public string Author { get; set; } // Автор
         public string ReleaseYear { get; set; } //Год издания
-        public string BookCode { get; set; } //Шифр книги
+        public string BookCode { get; set; } //Шифр книги ISBN13
         public int Count { get; set; } //Кол-во экземпляров
-        private static int size = 0;
+        private static int size = 0; //Размер массива/ID следующей книги
 
         public bool deleted { get; set; } //Статус, false - активна, true - удалена
 
+        // Конструктор класса Book
         public Book(string title, string author, string releaseYear, string bookCode, int count)
         {
             ID = size;
@@ -42,11 +43,15 @@ namespace REA_OOP_Stage_1
             deleted = false;
         }
 
+        // публичный статический int Index
+        // используется для восстановления индекса после загрузки данных
         public static int Index
         {
             set => size = value;
         }
 
+        // публичная функция object[] ForDataGrid()
+        // используется для предоставления данных объекта в удобном виде для добавления в таблицу
         public object[] ForDataGrid()
         {
             object[] tmp = {
@@ -60,6 +65,8 @@ namespace REA_OOP_Stage_1
             return tmp;
         }
 
+        // публичный int CompareTo
+        // реализуем метод интерфейса IComparable
         public int CompareTo(Book obj)
         {
             if (this.ID > obj.ID) { return 1; }
@@ -71,13 +78,14 @@ namespace REA_OOP_Stage_1
     [Serializable]
     internal class BookToReader: IComparable<BookToReader>
     {
-        public int ID { get; set;} //ID
+        public int ID { get; set;} //ID записи
         public int BookId { get; set;}//ID книги
         public int ReaderId { get; set;}//ID читателя
-        public DateTime IssueDate { get; set; } //Дата выдачи
-        public DateTime? ReceiveDate { get; set; } //Дата получени/возврата
-        private static int size = 0;
+        public DateTime IssueDate { get; set; } //Дата выдачи книги
+        public DateTime? ReceiveDate { get; set; } //Дата получени/возврата книги
+        private static int size = 0; //Размер массива/ID следующей записи
 
+        // Конструктор класса BookToReader
         public BookToReader(int bookId, int readerId, DateTime issueDate)
         {
             ID = size;
@@ -88,11 +96,15 @@ namespace REA_OOP_Stage_1
             size++;
         }
 
+        // публичный статический int Index
+        // используется для восстановления индекса после загрузки данных
         public static int Index
         {
             set => size = value;
         }
 
+        // публичный int CompareTo
+        // реализуем метод интерфейса IComparable
         public int CompareTo(BookToReader obj)
         {
             if (this.ID > obj.ID) { return 1; }

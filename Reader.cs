@@ -30,6 +30,7 @@ namespace REA_OOP_Stage_1
 
         public bool deleted { get; set; } //Статус, false - активна, true - удалена
 
+        // Конструктор класса Reader
         public Reader(string fullName, int ticketNum, DateTime birthday, string phone, string education)
         {
             ID = size;
@@ -42,6 +43,8 @@ namespace REA_OOP_Stage_1
             deleted = false;
         }
 
+        // публичный int CompareTo
+        // реализуем метод интерфейса IComparable
         public int CompareTo(Reader obj)
         {
             if (this.ID > obj.ID) { return 1; }
@@ -49,11 +52,15 @@ namespace REA_OOP_Stage_1
             return 0;
         }
 
+        // публичный статический int Index
+        // используется для восстановления индекса после загрузки данных
         public static int Index {
             set => size = value;
             get => size; 
         }
 
+        // публичная функция object[] ForDataGrid()
+        // используется для предоставления данных объекта в удобном виде для добавления в таблицу
         public object[] ForDataGrid()
         {
             object[] tmp = {
@@ -71,13 +78,14 @@ namespace REA_OOP_Stage_1
     [Serializable]
     internal class ReaderToHall : IComparable<ReaderToHall>
     {
-        public int ID { get; set; }
-        public int ReaderId { get; set; }
-        public int HallId { get; set; }
-        private static int size = 0;
+        public int ID { get; set; } // ID записи
+        public int ReaderId { get; set; } // ID читателя
+        public int HallId { get; set; } // ID зала
+        private static int size = 0; // Размер массива/ID следующей записи
 
         public bool deleted { get; set; } //Статус, false - активна, true - удалена
 
+        // Конструктор класса ReaderToHall
         public ReaderToHall(int readerId, int hallId)
         {
             ID = size;
@@ -87,11 +95,15 @@ namespace REA_OOP_Stage_1
             deleted = false;
         }
 
+        // публичный статический int Index
+        // используется для восстановления индекса после загрузки данных
         public static int Index
         {
             set => size = value;
         }
 
+        // публичный int CompareTo
+        // реализуем метод интерфейса IComparable
         public int CompareTo(ReaderToHall obj)
         {
             if (this.ID > obj.ID) { return 1; }
