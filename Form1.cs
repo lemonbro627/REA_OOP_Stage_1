@@ -18,6 +18,7 @@ namespace REA_OOP_Stage_1
 {
     public partial class Form1 : Form
     {
+        // инициализируем пустые массивы данных
         List<Book> books = new List<Book>();
         List<BookToReader> booksToReaders = new List<BookToReader>();
         List<Reader> readers = new List<Reader>();
@@ -780,11 +781,13 @@ namespace REA_OOP_Stage_1
                     Join(
                         booksToReaders,
                         readerToHall => readerToHall.ReaderId, booksToReader => booksToReader.ReaderId,
-                        // из всего запроса нас интересуют ID книг в нашем зале
-                        (readerToHall, booksToReader) => new { booksToReader.BookId }).
+                        // из всего запроса нас интересуют ID книг в выбранном зале
+                        (readerToHall, booksToReader) => new { booksToReader.BookId, booksToReader.ReceiveDate }).
                     // из которым мы берём толко нужные нам книги
                     Where(w => w.BookId == Int32.Parse(book.Last())).
-                    // и в итоге берём их количесво
+                    // и фильтруем, что бы записи были только о невозвращённых книгах
+                    Where(w => w.ReceiveDate == null).
+                    // и получаем их количесво
                     Count();
 
                 // формируем данные для отображения
